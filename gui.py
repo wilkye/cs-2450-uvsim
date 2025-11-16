@@ -46,21 +46,47 @@ class UvsimGUI:
         self.load_mem()
         self.cpu.run()
 
-    def submit_input(self):
-        content = self.input_entry.get("1.0", tk.END).strip()
-        digits = content.lstrip("+-")
-        # Accept 4- or 6-digit input depending on CPU version
-        expected_len = 6 if hasattr(self.memory, "WORD_SIZE") and self.memory.WORD_SIZE == 6 else 4
+   def submit_input(self):
+        raw = self.input_entry.get("1.0", tk.END).strip()
 
-        if digits.isdigit() and len(digits) == expected_len:
-            self.conInstruct.READ(self.conInstruct.temp_address)
-            self.log_message(f"Submitted input: {content}")
-            self.resume_cpu()
-        else:
-            self.log_message(f"Invalid input — must be a signed {expected_len}-digit number "
-                             f"(e.g. +{'0'*(expected_len-1)}1).")
+        if not raw:
+            self.log_message("Invalid input — empty.")
+            return
+
+        # strip sign, detect sign
+        sign = "-" if raw.startswith("-") else "+"
+        digits = raw.lstrip("+-")
+
+        if not digits.isdigit():
+            self.log_message("Invalid input — must be a number.")
+            return
+
+        # word size for this memory type
+        expected_len = getattr(self.memory, "WORD_SIZE", 4)
+
+        # must be exact length
+        if len(digits) != expected_len:
+            self.log_message(
+                f"Invalid input — must be a signed {expected_len}-digit number "
+                f"(e.g. +{'0'*(expected_len-1)}1)."
+            )
+            return
+
+        # pad and store input
+        padded = sign + digits.zfill(expected_len)
+        self.conInstruct.input_buffer = padded
+        self.log_message(f"Submitted input: {padded}")
+
+        # perform the READ instruction using the stored buffer
+        self.conInstruct.READ(self.conInstruct.temp_address)
+
+        # now resume CPU
+        self.resume_cpu()
+
+        # finally clear input and disable button
         self.input_entry.delete("1.0", tk.END)
         self.btn_submit.configure(state=tk.DISABLED)
+
 
     def load_file(self):
         try:
