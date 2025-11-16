@@ -10,8 +10,14 @@ class ControlInstructions:
 
     # READ instruction
     def READ(self, address):
-        if self.temp_address != None:
-            self.memory.set_value(address, int(self.gui.input_entry.get("1.0", "end-1c")))
+        if self.temp_address is not None:
+            # Use the GUI-provided, validated, padded input
+            value = int(self.input_buffer)
+
+            # Store into memory
+            self.memory.set_value(address, value)
+
+            # Clear temp state
             self.temp_address = None
 
     # WRITE instruction
