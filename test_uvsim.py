@@ -159,3 +159,35 @@ def test_multiply_by_zero(math_and_memory):
     memory.set_value(7, 0)
     result = math_inst.MULTIPLY(1234, 7)
     assert result == 0
+
+def test_six_digit_memory_write_and_read(setup_uvsim):
+    _, _, _, memory = setup_uvsim
+    six_digit_word = "020012"
+    memory.set_value(0, six_digit_word)
+    assert memory.get_value(0) == "+020012"
+
+def test_six_digit_zero_padding(setup_uvsim):
+    _, _, _, memory = setup_uvsim
+    memory.set_value(1, '000005')
+    assert memory.get_value(1) == "+000005"
+
+def test_six_digit_max_address_allowed(setup_uvsim):
+    _, _, _, memory = setup_uvsim
+    memory.set_value(249, '123456')
+    assert memory.get_value(249) == "+123456"
+
+def test_six_digit_opcode_and_address_format(setup_uvsim):
+    _, control, _, memory = setup_uvsim
+    memory.set_value(20, '010234')
+    assert memory.get_value(20) == "+010234"
+    control.LOAD(20)
+    assert control.cpu.accumulator is not None
+
+def test_six_digit_negative_values(setup_uvsim):
+    _, _, _, memory = setup_uvsim
+    memory.set_value(5, '-000042')
+    assert memory.get_value(5) == "-000042"
+
+def test_memory_size_is_250(setup_uvsim):
+    _, _, _, memory = setup_uvsim
+    assert len(memory.mem) == 250

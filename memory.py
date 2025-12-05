@@ -2,7 +2,7 @@
 
 class Memory:
     def __init__(self):
-        self.size = 100
+        self.size = 250
         self.mem = [0] * self.size
 
     def reset(self):

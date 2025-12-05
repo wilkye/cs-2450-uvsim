@@ -5,11 +5,12 @@ from six_digit_handler import Memory6, CPU6, ControlInstructions6, MathInstructi
 
 
 class UvsimGUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("UVSim Simulator")
-        self.root.geometry("900x675")
-        self.root.configure(padx=10, pady=10)
+    def __init__(self, window):
+        self.window = window
+        self.root = window
+        self.window.title("UVSim Simulator")
+        self.window.geometry("900x675")
+        self.window.configure(padx=10, pady=10)
         self.current_entry = None
         self.program_lines = []
         self.create_widgets()
@@ -286,8 +287,8 @@ class UvsimGUI:
         self.load_mem()
     def open_theme_menu(self, event=None):
         # Popup position (under the mouse)
-        x = self.root.winfo_pointerx()
-        y = self.root.winfo_pointery()
+        x = self.window.winfo_pointerx()
+        y = self.window.winfo_pointery()
 
  
         self.theme_menu.tk_popup(x, y)
@@ -336,7 +337,7 @@ class UvsimGUI:
             theme_key = "default mode"
         colors = self.themes[theme_key]
 
-        self.root.configure(bg=colors['bg'])
+        self.window.configure(bg=colors['bg'])
 
         style = ttk.Style()
         style.theme_use('default')
@@ -369,7 +370,7 @@ class UvsimGUI:
             insertbackground=colors['text_fg']
         )
 
-        self.apply_widget_theme(self.root, colors)
+        self.apply_widget_theme(self.window, colors)
 
     def apply_widget_theme(self, widget, colors):
         # Apply colors based on widget type
@@ -403,6 +404,10 @@ class UvsimGUI:
         for child in widget.winfo_children():
             self.apply_widget_theme(child, colors)
 
+    def open_new_instance(self):
+        new_window = tk.Toplevel()
+        UvsimGUI(new_window)
+
     def create_widgets(self):
         # The Dictionary of Themes
         self.themes = {
@@ -433,7 +438,7 @@ class UvsimGUI:
         }
 
         # Themes
-        self.theme_menu = tk.Menu(self.root, tearoff=0)
+        self.theme_menu = tk.Menu(self.window, tearoff=0)
         self.theme_menu.add_command(label="Default Mode", command=lambda: self.change_theme("Default Mode")) #RGB (76,114,29) / Hex# 4C721D (Dark Green) & (White) RGB (255,255,255 / #FFFFFF)
         self.theme_menu.add_command(label="Dark Mode", command=lambda: self.change_theme("Dark Mode"))
         self.theme_menu.add_command(label="Light Mode", command=lambda: self.change_theme("Light Mode"))
@@ -445,25 +450,26 @@ class UvsimGUI:
         style.configure("Disabled.TButton", foreground="gray")  # Disabled state
 
         # Menu Bar
-        menubar = tk.Menu(self.root)
+        menubar = tk.Menu(self.window)
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open", command=self.open_file)
+        file_menu.add_command(label="Open New Window", command=self.open_new_instance)
         file_menu.add_command(label="Save", command=self.save_file)
         file_menu.add_command(label="Save As", command=self.save_file_as)
         file_menu.add_command(label="Themes", command=self.open_theme_menu)
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.root.quit)
+        file_menu.add_command(label="Exit", command=self.window.destroy)
         menubar.add_cascade(label="File", menu=file_menu)
 
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(label="About", command=lambda: None)
         menubar.add_cascade(label="Help", menu=help_menu)
-        self.root.config(menu=menubar)
+        self.window.config(menu=menubar)
 
         
 
         # Main layout frames
-        main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 5))
+        main_frame = ttk.Frame(self.window, padding=(5, 5, 5, 5))
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # Left frame for controls and output
@@ -480,7 +486,7 @@ class UvsimGUI:
         self.btn_run = ttk.Button(controls_frame, text="Run", command=lambda: self.check_run(), state=tk.DISABLED) # Starts the program from the beginning of the input file.
         # self.btn_step = ttk.Button(controls_frame, text="Step", command=lambda: None, style="Disabled.TButton", state=tk.DISABLED) # Steps through the program
         self.btn_reset = ttk.Button(controls_frame, text="Reset", command=lambda: self.reset(), state=tk.DISABLED) # Could reset the accumulator to its default value and reset the pointer looking at the input file to run through the program from the beginning of the file.
-        self.btn_exit = ttk.Button(controls_frame, text="Exit", command=sys.exit) # Closes the window and stops the program
+        self.btn_exit = ttk.Button(controls_frame, text="Exit", command=self.window.destroy) # Closes the window and stops the program
 
         self.btn_run.grid(row=0, column=1, padx=5, pady=5)
         # self.btn_step.grid(row=0, column=2, padx=5, pady=5)
@@ -532,7 +538,7 @@ class UvsimGUI:
         btn_remove = ttk.Button(mem_button_frame, text="Clear", width=10, command=self.remove_memory_cell)
         btn_remove.pack(anchor="center", pady=5)
 
-        submit_frame = ttk.Frame(self.root)
+        submit_frame = ttk.Frame(self.window)
         submit_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10, padx=10)
         self.btn_submit = ttk.Button(submit_frame, text="Submit", command=self.submit_input, state=tk.DISABLED)
         self.btn_submit.pack(side=tk.LEFT)

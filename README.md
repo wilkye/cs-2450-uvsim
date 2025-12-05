@@ -48,6 +48,17 @@ You can personalize UVSim’s appearance with system-wide custom colors **(File 
 
 ---
 
+## 🪟 Multiple Instances Support
+
+UVSim now supports running multiple simulator windows at the same time.
+You can open a completely new instance by selecting:
+
+**File → Open New Window**
+
+Each window runs independently, allowing you to test different programs, compare outputs, or debug side-by-side without interfering with your main session.
+
+---
+
 ## 💡 What You'll See
 While the program is running, you will see messages that tell you what the simulator is doing—such as loading instructions, reading input, or displaying output. You might also see updates showing the contents of memory or the accumulator (a special place where calculations happen).  
 
@@ -119,3 +130,4 @@ Developed by **Darby Thomas**, **Ethan Rasmussen**, and **Kyle Greer**
 - Memory editing by **double-clicking** on memory cells
 - **Clear** memory entries interactively
 - System-wide **custom color themes**
+- Open multiple instances via **File → Open New Window**
